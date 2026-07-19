@@ -28,7 +28,7 @@ SMALI_INJECT = f"""
     const-string v11, "{WATERMARK_TEXT}"
     invoke-virtual {{v10, v11}}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
 
-    # White color
+    # White text color
     const v11, -0x1
     invoke-virtual {{v10, v11}}, Landroid/widget/TextView;->setTextColor(I)V
 
@@ -38,9 +38,14 @@ SMALI_INJECT = f"""
     int-to-float v12, v12
     invoke-virtual {{v10, v11, v12}}, Landroid/widget/TextView;->setTextSize(IF)V
 
-    # Alpha 0.75
-    const v11, 0x3F400000
-    invoke-virtual {{v10, v11}}, Landroid/widget/TextView;->setAlpha(F)V
+    # Black background 80% opacity = 0xCC000000 = -0x34000000
+    const v11, -0x34000000
+    invoke-virtual {{v10, v11}}, Landroid/widget/TextView;->setBackgroundColor(I)V
+
+    # Padding: left=16, top=4, right=16, bottom=4
+    const/16 v11, 0x10
+    const/4 v12, 0x4
+    invoke-virtual {{v10, v11, v12, v11, v12}}, Landroid/widget/TextView;->setPadding(IIII)V
 
     # Get Window DecorView
     invoke-virtual {{p0}}, Landroid/app/Activity;->getWindow()Landroid/view/Window;

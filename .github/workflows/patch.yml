@@ -79,6 +79,37 @@ jobs:
           mkdir -p mc_decompiled/lib/arm64-v8a
           cp libmaterialbinloader.so mc_decompiled/lib/arm64-v8a/libmaterialbinloader.so
 
+      - name: Patch app name, icon & package
+        run: |
+          sudo apt-get install -y imagemagick --quiet
+
+          # ── App label in manifest ──────────────────────────────────────────
+          sed -i 's/android:label="[^"]*"/android:label="Minecraft(Patched)"/' \
+            mc_decompiled/AndroidManifest.xml
+
+          # ── App name in strings.xml (fallback) ────────────────────────────
+          find mc_decompiled/res -name "strings.xml" -exec \
+            sed -i 's|<string name="app_name">.*</string>|<string name="app_name">Minecraft(Patched)</string>|g' {} \;
+
+          # ── Package name ───────────────────────────────────────────────────
+          sed -i 's/package="com\.mojang\.minecraftpe"/package="com.mojang.minecraftpe.patch"/' \
+            mc_decompiled/AndroidManifest.xml
+
+          # ── App icon — replace every mipmap PNG with our custom icon ───────
+          for dir in mc_decompiled/res/mipmap-*/; do
+            case "$(basename "$dir")" in
+              mipmap-mdpi*)    RES=48  ;;
+              mipmap-hdpi*)    RES=72  ;;
+              mipmap-xhdpi*)   RES=96  ;;
+              mipmap-xxhdpi*)  RES=144 ;;
+              mipmap-xxxhdpi*) RES=192 ;;
+              *)               RES=96  ;;
+            esac
+            for icon in "$dir"*.png; do
+              [ -f "$icon" ] && convert assets/icon.png -resize ${RES}x${RES} "$icon"
+            done
+          done
+
       - name: Patch smali
         run: python3 scripts/smali_inject.py mc_decompiled
 
