@@ -440,8 +440,8 @@
   }
 
   function loadSettings() {
-    document.getElementById('ghUser').value = LS.get('user');
-    document.getElementById('ghRepo').value = LS.get('repo');
+    document.getElementById('ghUser').value = LS.get('user') || 'RD7890';
+    document.getElementById('ghRepo').value = LS.get('repo') || 'mcpatch-tool';
     document.getElementById('ghPat').value  = LS.get('pat');
     updateLinks();
   }
