@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MCPE MaterialBin Patcher</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    :root {
+      --bg:        #0d0f14;
+      --surface:   #161922;
+      --card:      #1e2230;
+      --border:    #2a2f42;
+      --accent:    #5865f2;
+      --accent-h:  #4752c4;
+      --green:     #23d18b;
+      --yellow:    #f5c542;
+      --red:       #f04747;
+      --text:      #e2e5f0;
+      --muted:     #8891a8;
+      --radius:    12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── Navbar ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 32px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .nav-logo .cube {
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .nav-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+    .nav-link:hover { color: var(--text); }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      padding: 72px 24px 48px;
+      background: radial-gradient(ellipse at 50% 0%, #1a1d3a 0%, transparent 65%);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(88,101,242,.15);
+      border: 1px solid rgba(88,101,242,.35);
+      color: #a5acff;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 99px;
+      margin-bottom: 20px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 30%, #a5acff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 14px;
+    }
+    .hero p {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title .icon {
+      width: 28px; height: 28px;
+      background: rgba(88,101,242,.15);
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+
+    /* ── Form ── */
+    .form-group { margin-bottom: 18px; }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+    input[type=text], input[type=password] {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 11px 14px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    input[type=text]:focus, input[type=password]:focus {
+      border-color: var(--accent);
+    }
+    input::placeholder { color: #4a5268; }
+
+    .row { display: flex; gap: 16px; }
+    .row .form-group { flex: 1; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      font-family: inherit;
+    }
+    .btn:hover { background: var(--accent-h); }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-full { width: 100%; justify-content: center; }
+
+    .btn-secondary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-secondary:hover { background: var(--card); }
+
+    /* ── Status toast ── */
+    #toast {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 18px;
+      border-radius: 9px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      margin-top: 16px;
+    }
+    #toast.success { background: rgba(35,209,139,.12); border: 1px solid rgba(35,209,139,.3); color: var(--green); display: flex; }
+    #toast.error   { background: rgba(240,71,71,.12);  border: 1px solid rgba(240,71,71,.3);  color: var(--red);   display: flex; }
+    #toast.info    { background: rgba(88,101,242,.12); border: 1px solid rgba(88,101,242,.3); color: #a5acff;      display: flex; }
+
+    /* ── PAT section ── */
+    .pat-hint {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .pat-hint a { color: #a5acff; }
+
+    /* ── Releases ── */
+    .releases-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .release-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 18px 20px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .release-info .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .release-info .name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin: 2px 0;
+    }
+    .release-info .date {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .release-assets {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .dl-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(35,209,139,.12);
+      border: 1px solid rgba(35,209,139,.25);
+      color: var(--green);
+      padding: 7px 14px;
+      border-radius: 7px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .dl-btn:hover { background: rgba(35,209,139,.22); }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--muted);
+    }
+    .empty-state .big { font-size: 2.5rem; margin-bottom: 10px; }
+
+    /* ── Spinner ── */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Steps ── */
+    .steps {
+      display: flex;
+      gap: 12px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .step .num {
+      width: 20px; height: 20px;
+      background: var(--border);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+    .step-arrow { color: var(--border); font-size: 0.8rem; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 32px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+    footer a { color: #a5acff; text-decoration: none; }
+
+    @media (max-width: 600px) {
+      .row { flex-direction: column; }
+      nav { padding: 14px 18px; }
+      .hero { padding: 48px 18px 32px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav>
+  <div class="nav-logo">
+    <div class="cube">⛏</div>
+    MCPE MaterialBin Patcher
+  </div>
+  <a class="nav-link" id="repoLink" href="#" target="_blank">View on GitHub →</a>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="badge">⚡ Personal Patcher Tool</div>
+  <h1>Patch Minecraft with<br>MaterialBinLoader</h1>
+  <p>Provide your Minecraft APK URL, trigger the workflow, and get a patched APK with full shader support.</p>
+</div>
+
+<div class="container">
+
+  <!-- Settings card (PAT + repo) -->
+  <div class="card">
+    <div class="card-title"><div class="icon">⚙</div> Setup</div>
+    <div class="row">
+      <div class="form-group">
+        <label>GitHub Username</label>
+        <input type="text" id="ghUser" placeholder="your-username" />
+      </div>
+      <div class="form-group">
+        <label>Repository Name</label>
+        <input type="text" id="ghRepo" placeholder="mcpatch-tool" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>GitHub Personal Access Token (PAT)</label>
+      <input type="password" id="ghPat" placeholder="ghp_xxxxxxxxxxxx" />
+      <p class="pat-hint">Needs <code>repo</code> + <code>workflow</code> scope. Stored only in your browser (localStorage). <a href="https://github.com/settings/tokens/new?scopes=repo,workflow" target="_blank">Create one →</a></p>
+    </div>
+    <button class="btn btn-secondary" onclick="saveSettings()">💾 Save Settings</button>
+  </div>
+
+  <!-- Patch card -->
+  <div class="card">
+    <div class="card-title"><div class="icon">🔧</div> Create New Patch</div>
+    <div class="steps">
+      <div class="step"><div class="num">1</div> Enter APK URL</div>
+      <div class="step-arrow">›</div>
+      <div class="step"><div class="num">2</div> Trigger Workflow</div>
+      <div class="step-arrow">›</div>
+      <div class="step"><div class="num">3</div> Download Patched APK</div>
+    </div>
+    <br>
+    <div class="form-group">
+      <label>Minecraft APK Direct Download URL</label>
+      <input type="text" id="apkUrl" placeholder="https://example.com/minecraft-1.21.51.apk" />
+    </div>
+    <div class="row">
+      <div class="form-group">
+        <label>Release Tag</label>
+        <input type="text" id="releaseTag" placeholder="1.21.51-mbl" />
+      </div>
+      <div class="form-group">
+        <label>MBL Version (blank = latest)</label>
+        <input type="text" id="mblVersion" placeholder="14" />
+      </div>
+    </div>
+    <button class="btn btn-full" id="patchBtn" onclick="triggerPatch()">
+      ⚡ Trigger Patch Workflow
+    </button>
+    <div id="toast"></div>
+  </div>
+
+  <!-- Releases -->
+  <div class="card">
+    <div class="releases-header">
+      <div class="card-title" style="margin-bottom:0"><div class="icon">📦</div> Releases</div>
+      <button class="btn btn-secondary" onclick="loadReleases()" style="padding:8px 14px;font-size:0.82rem">↻ Refresh</button>
+    </div>
+    <div id="releasesList">
+      <div class="empty-state">
+        <div class="big">📦</div>
+        Save your settings and releases will appear here.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Built for personal use &nbsp;·&nbsp;
+  <a href="https://github.com/ddf8196/MaterialBinLoader" target="_blank">MaterialBinLoader</a> by ddf8196 &nbsp;·&nbsp;
+  <a id="footerRepo" href="#" target="_blank">Source</a>
+</footer>
+
+<script>
+  // ── Config ──────────────────────────────────────────────────────────────
+  const LS = {
+    get: k => localStorage.getItem('mcpatch_' + k) || '',
+    set: (k, v) => localStorage.setItem('mcpatch_' + k, v),
+  };
+
+  function saveSettings() {
+    LS.set('user', document.getElementById('ghUser').value.trim());
+    LS.set('repo', document.getElementById('ghRepo').value.trim());
+    LS.set('pat',  document.getElementById('ghPat').value.trim());
+    showToast('✅ Settings saved!', 'success');
+    updateLinks();
+    loadReleases();
+  }
+
+  function loadSettings() {
+    document.getElementById('ghUser').value = LS.get('user');
+    document.getElementById('ghRepo').value = LS.get('repo');
+    document.getElementById('ghPat').value  = LS.get('pat');
+    updateLinks();
+  }
+
+  function updateLinks() {
+    const u = LS.get('user'), r = LS.get('repo');
+    const url = u && r ? `https://github.com/${u}/${r}` : '#';
+    document.getElementById('repoLink').href  = url;
+    document.getElementById('footerRepo').href = url;
+  }
+
+  // ── Toast ────────────────────────────────────────────────────────────────
+  function showToast(msg, type = 'info') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = type;
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.className = '', 6000);
+  }
+
+  // ── Trigger workflow ─────────────────────────────────────────────────────
+  async function triggerPatch() {
+    const user = LS.get('user');
+    const repo = LS.get('repo');
+    const pat  = LS.get('pat');
+    const apkUrl     = document.getElementById('apkUrl').value.trim();
+    const releaseTag = document.getElementById('releaseTag').value.trim();
+    const mblVer     = document.getElementById('mblVersion').value.trim();
+
+    if (!user || !repo || !pat) {
+      showToast('⚠️ Save your setup settings first.', 'error'); return;
+    }
+    if (!apkUrl) {
+      showToast('⚠️ Paste the Minecraft APK URL.', 'error'); return;
+    }
+    if (!releaseTag) {
+      showToast('⚠️ Enter a release tag (e.g. 1.21.51-mbl).', 'error'); return;
+    }
+
+    const btn = document.getElementById('patchBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Triggering…';
+    showToast('🔄 Sending request to GitHub Actions…', 'info');
+
+    try {
+      const res = await fetch(
+        `https://api.github.com/repos/${user}/${repo}/actions/workflows/patch.yml/dispatches`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${pat}`,
+            Accept: 'application/vnd.github+json',
+            'Content-Type': 'application/json',
+            'X-GitHub-Api-Version': '2022-11-28',
+          },
+          body: JSON.stringify({
+            ref: 'main',
+            inputs: {
+              apk_url:     apkUrl,
+              release_tag: releaseTag,
+              mbl_version: mblVer,
+            },
+          }),
+        }
+      );
+
+      if (res.status === 204) {
+        showToast('✅ Workflow triggered! Check GitHub Actions → releases will appear here when done.', 'success');
+        document.getElementById('apkUrl').value = '';
+        setTimeout(loadReleases, 8000);
+      } else {
+        const body = await res.json().catch(() => ({}));
+        showToast(`❌ Error ${res.status}: ${body.message || 'Unknown error'}`, 'error');
+      }
+    } catch (e) {
+      showToast('❌ Network error: ' + e.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '⚡ Trigger Patch Workflow';
+    }
+  }
+
+  // ── Load releases ────────────────────────────────────────────────────────
+  async function loadReleases() {
+    const user = LS.get('user');
+    const repo = LS.get('repo');
+    const pat  = LS.get('pat');
+    const el   = document.getElementById('releasesList');
+
+    if (!user || !repo) return;
+
+    el.innerHTML = '<div class="empty-state"><span class="spinner" style="width:24px;height:24px;border-width:3px"></span></div>';
+
+    try {
+      const headers = { Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' };
+      if (pat) headers.Authorization = `Bearer ${pat}`;
+
+      const res  = await fetch(`https://api.github.com/repos/${user}/${repo}/releases?per_page=20`, { headers });
+      const data = await res.json();
+
+      if (!Array.isArray(data) || data.length === 0) {
+        el.innerHTML = `<div class="empty-state"><div class="big">🚀</div>No releases yet. Trigger your first patch above!</div>`;
+        return;
+      }
+
+      el.innerHTML = data.map(r => {
+        const date   = new Date(r.published_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+        const assets = r.assets.map(a => `
+          <a class="dl-btn" href="${a.browser_download_url}" download>
+            ⬇ ${a.name} <span style="opacity:.6">(${(a.size/1024/1024).toFixed(1)} MB)</span>
+          </a>`).join('');
+
+        return `
+          <div class="release-item">
+            <div class="release-info">
+              <div class="tag">${r.tag_name}</div>
+              <div class="name">${r.name || r.tag_name}</div>
+              <div class="date">${date}</div>
+            </div>
+            <div class="release-assets">
+              ${assets || '<span style="color:var(--muted);font-size:.82rem">No assets</span>'}
+            </div>
+          </div>`;
+      }).join('');
+    } catch (e) {
+      el.innerHTML = `<div class="empty-state"><div class="big">⚠️</div>${e.message}</div>`;
+    }
+  }
+
+  // ── Init ─────────────────────────────────────────────────────────────────
+  loadSettings();
+  if (LS.get('user') && LS.get('repo')) loadReleases();
+</script>
+</body>
+</html>
