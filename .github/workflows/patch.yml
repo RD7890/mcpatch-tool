@@ -94,37 +94,7 @@ jobs:
             sed -i 's|<string name="app_name">.*</string>|<string name="app_name">Minecraft(Patched)</string>|g' {} \;
 
           # ── App icon — use Python/Pillow (pre-installed, no apt needed) ───
-          python3 - << 'PYEOF'
-import os, glob
-from PIL import Image
-
-sizes = {
-    'mipmap-mdpi':    48,
-    'mipmap-hdpi':    72,
-    'mipmap-xhdpi':   96,
-    'mipmap-xxhdpi':  144,
-    'mipmap-xxxhdpi': 192,
-}
-
-src = Image.open('assets/icon.png').convert('RGBA')
-
-replaced = 0
-for dname, size in sizes.items():
-    for f in glob.glob(f'mc_decompiled/res/{dname}/*.png'):
-        img = src.resize((size, size), Image.LANCZOS)
-        img.save(f, 'PNG')
-        print(f'  Replaced: {f}  ({size}x{size})')
-        replaced += 1
-
-if replaced == 0:
-    print('WARNING: No mipmap PNGs found — check decompiled res/ structure')
-    for root, dirs, files in os.walk('mc_decompiled/res'):
-        for fn in files:
-            if fn.endswith('.png'):
-                print(' ', os.path.join(root, fn))
-else:
-    print(f'[+] Replaced {replaced} icon file(s).')
-PYEOF
+          python3 scripts/inject_icons.py mc_decompiled assets/icon.png
 
       - name: Patch smali
         run: python3 scripts/smali_inject.py mc_decompiled
