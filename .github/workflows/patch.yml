@@ -72,7 +72,7 @@ jobs:
           echo "APK: $(du -sh minecraft_original.apk | cut -f1)"
 
       - name: Decompile APK
-        run: java -jar apktool.jar d minecraft_original.apk -o mc_decompiled --no-res -f
+        run: java -jar apktool.jar d minecraft_original.apk -o mc_decompiled -f
 
       - name: Inject native library
         run: |
@@ -81,34 +81,50 @@ jobs:
 
       - name: Patch app name, icon & package
         run: |
-          sudo apt-get install -y imagemagick --quiet
-
           # ── App label in manifest ──────────────────────────────────────────
           sed -i 's/android:label="[^"]*"/android:label="Minecraft(Patched)"/' \
+            mc_decompiled/AndroidManifest.xml
+
+          # ── Package name ───────────────────────────────────────────────────
+          sed -i 's/package="com\.mojang\.minecraftpe"/package="com.mojang.minecraftpe.patch"/' \
             mc_decompiled/AndroidManifest.xml
 
           # ── App name in strings.xml (fallback) ────────────────────────────
           find mc_decompiled/res -name "strings.xml" -exec \
             sed -i 's|<string name="app_name">.*</string>|<string name="app_name">Minecraft(Patched)</string>|g' {} \;
 
-          # ── Package name ───────────────────────────────────────────────────
-          sed -i 's/package="com\.mojang\.minecraftpe"/package="com.mojang.minecraftpe.patch"/' \
-            mc_decompiled/AndroidManifest.xml
+          # ── App icon — use Python/Pillow (pre-installed, no apt needed) ───
+          python3 - << 'PYEOF'
+import os, glob
+from PIL import Image
 
-          # ── App icon — replace every mipmap PNG with our custom icon ───────
-          for dir in mc_decompiled/res/mipmap-*/; do
-            case "$(basename "$dir")" in
-              mipmap-mdpi*)    RES=48  ;;
-              mipmap-hdpi*)    RES=72  ;;
-              mipmap-xhdpi*)   RES=96  ;;
-              mipmap-xxhdpi*)  RES=144 ;;
-              mipmap-xxxhdpi*) RES=192 ;;
-              *)               RES=96  ;;
-            esac
-            for icon in "$dir"*.png; do
-              [ -f "$icon" ] && convert assets/icon.png -resize ${RES}x${RES} "$icon"
-            done
-          done
+sizes = {
+    'mipmap-mdpi':    48,
+    'mipmap-hdpi':    72,
+    'mipmap-xhdpi':   96,
+    'mipmap-xxhdpi':  144,
+    'mipmap-xxxhdpi': 192,
+}
+
+src = Image.open('assets/icon.png').convert('RGBA')
+
+replaced = 0
+for dname, size in sizes.items():
+    for f in glob.glob(f'mc_decompiled/res/{dname}/*.png'):
+        img = src.resize((size, size), Image.LANCZOS)
+        img.save(f, 'PNG')
+        print(f'  Replaced: {f}  ({size}x{size})')
+        replaced += 1
+
+if replaced == 0:
+    print('WARNING: No mipmap PNGs found — check decompiled res/ structure')
+    for root, dirs, files in os.walk('mc_decompiled/res'):
+        for fn in files:
+            if fn.endswith('.png'):
+                print(' ', os.path.join(root, fn))
+else:
+    print(f'[+] Replaced {replaced} icon file(s).')
+PYEOF
 
       - name: Patch smali
         run: python3 scripts/smali_inject.py mc_decompiled
